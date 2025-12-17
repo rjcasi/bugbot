@@ -3,9 +3,10 @@ import random
 import plotly.graph_objs as go
 import plotly.io as pio
 import plotly.subplots as sp
-from sorting_utils import quicksort_animation, mergesort_animation
-from blockchain_utils import simulate_blockchain
-from entropy_utils import measure_entropy
+from modules.sorting_utils import quicksort_animation, mergesort_animation
+from modules.blockchain_utils import simulate_blockchain
+from modules.entropy_utils import measure_entropy
+from modules.robotics_utils import Motor, forward_kinematics, line_follow_step
 
 
 app = Flask(__name__)
@@ -107,6 +108,30 @@ def entropy_arena_advanced():
                            bcrypt_hash=bcrypt_h,
                            argon2_hash=argon2_h)
 
+
+
+@app.route("/robotics-arena")
+def robotics_arena():
+    # Demo motor control
+    left_motor = Motor("Left")
+    right_motor = Motor("Right")
+    motor_demo = [
+        left_motor.set_speed(50),
+        right_motor.set_speed(50),
+        left_motor.stop(),
+        right_motor.stop()
+    ]
+
+    # Demo kinematics
+    x, y = forward_kinematics(0.5, 0.5)
+
+    # Demo line-following
+    line_demo = [line_follow_step() for _ in range(5)]
+
+    return render_template("robotics_arena.html",
+                           motor_demo=motor_demo,
+                           kinematics=(x, y),
+                           line_demo=line_demo)
 
 if __name__ == "__main__":
     app.run(debug=True)

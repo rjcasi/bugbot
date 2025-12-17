@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Robotics Arena</h1>
+  <h2>Motor Control Demo</h2>
+  <ul>
+    {% for step in motor_demo %}
+      <li>{{ step }}</li>
+    {% endfor %}
+  </ul>
+
+  <h2>Arm Kinematics</h2>
+  <p>End effector position: ({{ kinematics[0] }}, {{ kinematics[1] }})</p>
+
+  <h2>Line Following Simulation</h2>
+  <ul>
+    {% for step in line_demo %}
+      <li>{{ step }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
