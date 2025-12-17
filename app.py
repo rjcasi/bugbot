@@ -5,6 +5,8 @@ import plotly.io as pio
 import plotly.subplots as sp
 from sorting_utils import quicksort_animation, mergesort_animation
 from blockchain_utils import simulate_blockchain
+from entropy_utils import measure_entropy
+
 
 app = Flask(__name__)
 
@@ -61,6 +63,50 @@ def blockchain_arena():
     fig.update_layout(title="Blockchain Arena: Transactions Confirmed into Blocks")
     
     return render_template("blockchain_arena.html", plot_html=pio.to_html(fig, full_html=False))
+
+@app.route("/entropy-arena")
+def entropy_arena():
+    lengths, md5_times, sha_times, md5_attempts, sha_attempts = measure_entropy()
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=lengths, y=md5_times,
+        mode="lines+markers", name="MD5 runtime"
+    ))
+    fig.add_trace(go.Scatter(
+        x=lengths, y=sha_times,
+        mode="lines+markers", name="SHA-256 runtime"
+    ))
+    fig.update_layout(title="Brute Force Runtime vs Password Length")
+    
+    fig2 = go.Figure()
+    fig2.add_trace(go.Scatter(
+        x=lengths, y=md5_attempts,
+        mode="lines+markers", name="MD5 attempts"
+    ))
+    fig2.add_trace(go.Scatter(
+        x=lengths, y=sha_attempts,
+        mode="lines+markers", name="SHA-256 attempts"
+    ))
+    fig2.update_layout(title="Brute Force Attempts vs Password Length")
+    
+    return render_template("entropy_arena.html",
+                           plot_runtime=pio.to_html(fig, full_html=False),
+                           plot_attempts=pio.to_html(fig2, full_html=False))
+
+@app.route("/entropy-arena-advanced")
+def entropy_arena_advanced():
+    password = "hunter2"
+    
+    bcrypt_h = bcrypt_hash(password)
+    argon2_h = argon2_hash(password)
+    
+    return render_template("entropy_arena.html",
+                           plot_runtime="",
+                           plot_attempts="",
+                           bcrypt_hash=bcrypt_h,
+                           argon2_hash=argon2_h)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
